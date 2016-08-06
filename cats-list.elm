@@ -4,6 +4,7 @@ import Html exposing (..)
 import Html.App as App
 import Html.Events exposing (onClick, onInput, onSubmit)
 import Html.Attributes exposing (..)
+import Logger exposing (logger)
 
 
 main =
@@ -49,11 +50,6 @@ type Action
     | Add
     | Input Cat
     | Restore
-
-
-logger update =
-    \action model ->
-        model |> (Debug.log "action" action |> update) |> Debug.log "model"
 
 
 update action model =
