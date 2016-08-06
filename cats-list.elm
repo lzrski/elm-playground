@@ -2,7 +2,7 @@ module Main exposing (..)
 
 import Html exposing (..)
 import Html.App as App
-import Html.Events exposing (onClick, onInput)
+import Html.Events exposing (onClick, onInput, onSubmit)
 import Html.Attributes exposing (..)
 
 
@@ -95,12 +95,18 @@ update action model =
 -- VIEW
 
 
-view model =
-    div []
-        [ input [ onInput Input, value model.input ] []
-        , button [ onClick Add ]
+add_a_cat_form what =
+    Html.form [ onSubmit Add ]
+        [ input [ onInput Input, value what ] []
+        , button []
             [ text "New cat!"
             ]
+        ]
+
+
+view model =
+    div []
+        [ add_a_cat_form model.input
         , ul []
             (List.map item model.cats)
         , button [ onClick Restore ]
