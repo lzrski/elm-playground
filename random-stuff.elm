@@ -22,7 +22,7 @@ main =
 
 
 type alias Model =
-    { dice : Maybe Int
+    { dices : Maybe ( Int, Int )
     }
 
 
@@ -37,17 +37,25 @@ initial =
 
 type Action
     = Roll
-    | NewFace Int
+    | NewFace ( Int, Int )
+
+
+d6 =
+    Random.int 1 6
+
+
+t2d6 =
+    Random.pair d6 d6
 
 
 update : Action -> Model -> ( Model, Cmd Action )
 update action model =
     case action of
         Roll ->
-            ( model, Random.generate NewFace (Random.int 1 6) )
+            ( model, Random.generate NewFace t2d6 )
 
-        NewFace number ->
-            ( Model (Just number), Cmd.none )
+        NewFace ( a, b ) ->
+            ( Model (Just ( a, b )), Cmd.none )
 
 
 subscriptions : Model -> Sub Action
@@ -63,12 +71,15 @@ view : Model -> Html Action
 view model =
     let
         message =
-            case model.dice of
+            case model.dices of
                 Nothing ->
                     "C'mon, be a playa!"
 
-                Just number ->
-                    "Look, it's " ++ (number |> toString)
+                Just ( a, b ) ->
+                    "Look, it's "
+                        ++ (a |> toString)
+                        ++ " and "
+                        ++ (b |> toString)
     in
         div []
             [ pre [] [ text message ]
