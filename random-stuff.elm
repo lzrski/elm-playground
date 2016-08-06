@@ -23,10 +23,9 @@ type alias Model =
     }
 
 
-initial : Model
+initial : ( Model, Cmd Action )
 initial =
-    { dice = 6
-    }
+    ( Model 6, Cmd.none )
 
 
 
@@ -37,19 +36,20 @@ type Action
     = Roll
 
 
-update : Action -> Model -> Model
-update action model =
+update : Action -> ( Model, Cmd Action ) -> ( Model, Cmd Action )
+update action ( model, command ) =
     case action of
         Roll ->
-            { model | dice = model.dice - 1 }
+            ( { model | dice = model.dice - 1 }, Cmd.none )
 
 
 
+-- subscriptions : Model -> Sub Action
 -- VIEW
 
 
-view : Model -> Html Action
-view model =
+view : ( Model, Cmd Action ) -> Html Action
+view ( model, command ) =
     div []
         [ pre [] [ text (toString model.dice) ]
         , button [ onClick Roll ] [ text "Roll the dice!" ]
