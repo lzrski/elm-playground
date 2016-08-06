@@ -4,13 +4,16 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import Html.App as App
+import Random
+import Logger exposing (logger)
 
 
 main =
-    App.beginnerProgram
-        { model = initial
-        , view = view
-        , update = update
+    App.program
+        { init = initial
+        , view = Debug.log "Rendering" >> view
+        , update = logger update
+        , subscriptions = subscriptions
         }
 
 
@@ -19,13 +22,13 @@ main =
 
 
 type alias Model =
-    { dice : Int
+    { dice : Maybe Int
     }
 
 
 initial : ( Model, Cmd Action )
 initial =
-    ( Model 6, Cmd.none )
+    ( Model Nothing, Cmd.none )
 
 
 
@@ -34,23 +37,40 @@ initial =
 
 type Action
     = Roll
+    | NewFace Int
 
 
-update : Action -> ( Model, Cmd Action ) -> ( Model, Cmd Action )
-update action ( model, command ) =
+update : Action -> Model -> ( Model, Cmd Action )
+update action model =
     case action of
         Roll ->
-            ( { model | dice = model.dice - 1 }, Cmd.none )
+            ( model, Random.generate NewFace (Random.int 1 6) )
+
+        NewFace number ->
+            ( Model (Just number), Cmd.none )
+
+
+subscriptions : Model -> Sub Action
+subscriptions model =
+    Sub.none
 
 
 
--- subscriptions : Model -> Sub Action
 -- VIEW
 
 
-view : ( Model, Cmd Action ) -> Html Action
-view ( model, command ) =
-    div []
-        [ pre [] [ text (toString model.dice) ]
-        , button [ onClick Roll ] [ text "Roll the dice!" ]
-        ]
+view : Model -> Html Action
+view model =
+    let
+        message =
+            case model.dice of
+                Nothing ->
+                    "C'mon, be a playa!"
+
+                Just number ->
+                    "Look, it's " ++ (number |> toString)
+    in
+        div []
+            [ pre [] [ text message ]
+            , button [ onClick Roll ] [ text "Roll the dice!" ]
+            ]
