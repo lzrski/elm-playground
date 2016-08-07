@@ -1,4 +1,4 @@
-module Main exposing (..)
+module TickTock exposing (Model, Msg, init, update, view)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -8,9 +8,12 @@ import Logger exposing (logger)
 import Time exposing (Time, second)
 
 
+-- We can run it as a program of it's own
+
+
 main =
     App.program
-        { init = initial
+        { init = init
         , view = Debug.log "Rendering" >> view
         , update = logger update
         , subscriptions = subscriptions
@@ -27,8 +30,8 @@ type alias Model =
     }
 
 
-initial : ( Model, Cmd Action )
-initial =
+init : ( Model, Cmd Msg )
+init =
     ( Model 0 False, Cmd.none )
 
 
@@ -36,20 +39,20 @@ initial =
 -- UPDATE
 
 
-type Action
+type Msg
     = Tick Time
     | Tock Time
     | Toggle
     | Rollback
 
 
-update : Action -> Model -> ( Model, Cmd Action )
-update action model =
+update : Msg -> Model -> ( Model, Cmd Msg )
+update msg model =
     let
         { ticks, enabled } =
             model
     in
-        case action of
+        case msg of
             Tick time ->
                 ( { model | ticks = model.ticks + 1 }, Cmd.none )
 
@@ -63,7 +66,7 @@ update action model =
                 ( { model | ticks = ticks - 10 }, Cmd.none )
 
 
-subscriptions : Model -> Sub Action
+subscriptions : Model -> Sub Msg
 subscriptions model =
     if model.enabled then
         Sub.batch
@@ -78,7 +81,7 @@ subscriptions model =
 -- VIEW
 
 
-view : Model -> Html Action
+view : Model -> Html Msg
 view model =
     div []
         [ pre [] [ text (model.ticks |> toString) ]
